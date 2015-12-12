@@ -41,9 +41,27 @@ when the panel is installed, and the capacity, as well as historic feed in tarri
 
 **Tech**
 
-Javascript: d3.js
-CSS: 
+- Javascript: d3.js
+- CSS: Bootstrap (it's well established does responsive out of the box. Having said that, it may be more
+than is needed for a simple project, but assuming the prototype grows larger then it may be a useful choice. 
+Also I am most familiar with it so for something quick I am just putting it in for the grid based and 
+also responsive reflows. Could have used e.g. Pure.css for a lighter weight option if necessary)
 
+**Code structure**
+
+- data loader/parser
+- one to control the stacked chart
+- one to control the map
+- d3.dispatch (?) to tie them together
+
+
+
+**Testing**
+
+Don't know much about testing frameworks etc but is hoping to learn!
+- Browser testing: does it work as expected on Chrome, FF, Safari and IE (and which version of IE is the
+absolute min for support?)
+-
 
 **Notes**
 
