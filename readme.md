@@ -89,4 +89,6 @@ Geojson overlay:
 - shapefiles from http://www.opendoorlogistics.com/data/
 - get info about the Sectors.shp `ogrinfo -q Sectors.shp -sql "SELECT * FROM Sectors" -fid 1`
 - then use ogr to parse the shapefile `ogr2ogr bristol_layer.shp Sectors.shp -sql "SELECT * FROM Sectors where (name like '%BS%')"`
+- use QGis to add a column with only the first part of the post code, then join the polygons with 
+`ogr2ogr bristol_layers_joined.shp bristol_layer_2.shp -dialect sqlite -sql "SELECT post_area ,ST_Union(geometry) as geometry FROM bristol_layer_2 GROUP BY post_area"`
 
