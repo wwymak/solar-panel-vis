@@ -5,7 +5,7 @@
 
 var nestedData,
 
-    width = 600, height = 500, margins = {top:40, left: 50, bottom: 50, right:40};
+    width = 600, height = 500, margins = {top:40, left: 50, bottom: 50, right:80};
 
 //scales
 var xTimeScale = d3.time.scale().range([0, width]),
@@ -48,6 +48,9 @@ var chartContainerSVG = d3.select("#lineChartContainer").append("svg")
 
 var stackedChartSVG = chartContainerSVG.append("g").attr("class", "chart-area")
     .attr("transform", "translate(" +  margins.left + "," + margins.top + ")");
+
+var legendSVG = chartContainerSVG.append("g").attr("class", "legend-group")
+    .attr("transform", "translate(" +(width + margins.right - 10) + "," + 10 + ")");
 
 
 d3.csv("data/energy_generation.csv", function(err, data){
@@ -113,30 +116,7 @@ d3.csv("data/energy_generation.csv", function(err, data){
     xTimeScale.domain([getMinDate(nestedData), getMaxDate(nestedData)]);
     yScale.domain([0, getMaxY(nestedData)])
 
-    stackedChartUpdate(nestedData)
-
-    ////data bind and 1 g per series for a postcode area
-    //var postCodeSel = stackedChartSVG.selectAll(".series")
-    //    .data(nestedData).enter().append("g")
-    //    .attr("class", "series");
-    //
-    ////then draw the actual stacked area
-    //postCodeSel.append("path")
-    //    .attr("class", "series-path")
-    //    .attr("d", function(d){
-    //        console.log(d);
-    //        d.values.forEach(function(item){
-    //            item.key = new Date(item.key)
-    //        })
-    //        return areaFunc(d.values)
-    //    })
-    //    .style("fill", function(d){
-    //        return colorScale(d.key)
-    //    })
-    //    .on("click", function(d){
-    //        console.log(d)
-    //        d3EvtDisatcher.postcodeSelected(d)
-    //    })
+    stackedChartUpdate(nestedData);
 
     //draw the xAxis --apend to the outer container g otherwise axis labels constrained to
     // the chart area
@@ -154,6 +134,9 @@ d3.csv("data/energy_generation.csv", function(err, data){
         .append("text").text("kWh").attr("text-anchor", "middle").attr("dy", "-1em");
 
     function stackedChartUpdate(nestedData){
+        //apply stacking func to the data -- data modified in place though so TODO check if needed to make a
+        //cloned copy of the data with Object.freeze (and make sure it's properly 'deep frozen'
+        stackFunc(nestedData)
         //update yScale
         yScale.domain([0, getMaxY(nestedData)])
 
@@ -182,7 +165,6 @@ d3.csv("data/energy_generation.csv", function(err, data){
                 return colorScale(d.key)
             })
             .on("click", function(d){
-                console.log(d)
                 d3EvtDisatcher.postcodeSelected(d)
             })
 
@@ -190,22 +172,45 @@ d3.csv("data/energy_generation.csv", function(err, data){
         d3.selectAll(".series-path").attr("d", function(d){
             d.values.forEach(function(item){
                 item.key = new Date(item.key)
-            })
+            });
             return areaFunc(d.values)
-        })
+        });
 
 
         //update yAxis
         yAxis.scale(yScale)
         d3.select(".y.axis").call(yAxis)
 
+        //update legends
+        var legend = legendSVG.selectAll(".legend")
+            .data(nestedData, function(d){return d.key});
+
+        legend.enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function (d, i) {
+                return "translate(0," + i * 20 + ")";
+            });
+
+        legend.exit().remove();
+
+        legend.append("rect").attr("x", 0)
+            .attr("width", 20)
+            .attr("height", 10)
+            .style("fill", function(d){return colorScale(d.key)} )
+
+        legend.append("text")
+            .attr("x", 25)
+            .attr("y", 6)
+            .attr("dy", ".35em")
+            .text(function (d) { return d.key; });
+
+
     }
 
     d3EvtDisatcher.on("postcodeSelected", function(data){
-        console.log(stackFunc([data]))
-        stackedChartUpdate(stackFunc([data]))
+        stackedChartUpdate([data]);
     })
-})
+});
 
 
 
