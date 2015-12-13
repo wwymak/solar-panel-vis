@@ -5,7 +5,7 @@
 
 var nestedData,
 
-    width = 600, height = 500, margins = {top:20, left: 50, bottom: 50, right:40};
+    width = 600, height = 500, margins = {top:40, left: 50, bottom: 50, right:40};
 
 //scales
 var xTimeScale = d3.time.scale().range([0, width]),
@@ -36,6 +36,9 @@ var areaFunc = d3.svg.area()
     .x(function(d) { return xTimeScale(d.key); })
     .y0(function(d) { return yScale(d.y0); })
     .y1(function(d) { return yScale(d.y0 + d.y); });
+
+//d3 custom event listeners
+var d3EvtDisatcher = d3.dispatch('postcodeSelected')
 
 //init svg for stackedAReaChart
 var chartContainerSVG = d3.select("#lineChartContainer").append("svg")
@@ -110,27 +113,30 @@ d3.csv("data/energy_generation.csv", function(err, data){
     xTimeScale.domain([getMinDate(nestedData), getMaxDate(nestedData)]);
     yScale.domain([0, getMaxY(nestedData)])
 
-    //data bind and 1 g per series for a postcode area
-    var postCodeSel = stackedChartSVG.selectAll(".series")
-        .data(nestedData).enter().append("g")
-        .attr("class", "series");
+    stackedChartUpdate(nestedData)
 
-    //then draw the actual stacked area
-    postCodeSel.append("path")
-        .attr("class", "series-path")
-        .attr("d", function(d){
-            console.log(d);
-            d.values.forEach(function(item){
-                item.key = new Date(item.key)
-            })
-            return areaFunc(d.values)
-        })
-        .style("fill", function(d){
-            return colorScale(d.key)
-        })
-        .on("mouseover", function(d){
-            console.log(d)
-        })
+    ////data bind and 1 g per series for a postcode area
+    //var postCodeSel = stackedChartSVG.selectAll(".series")
+    //    .data(nestedData).enter().append("g")
+    //    .attr("class", "series");
+    //
+    ////then draw the actual stacked area
+    //postCodeSel.append("path")
+    //    .attr("class", "series-path")
+    //    .attr("d", function(d){
+    //        console.log(d);
+    //        d.values.forEach(function(item){
+    //            item.key = new Date(item.key)
+    //        })
+    //        return areaFunc(d.values)
+    //    })
+    //    .style("fill", function(d){
+    //        return colorScale(d.key)
+    //    })
+    //    .on("click", function(d){
+    //        console.log(d)
+    //        d3EvtDisatcher.postcodeSelected(d)
+    //    })
 
     //draw the xAxis --apend to the outer container g otherwise axis labels constrained to
     // the chart area
@@ -139,10 +145,66 @@ d3.csv("data/energy_generation.csv", function(err, data){
         .attr("transform", "translate(" + margins.left + "," + (height + margins.top) + ")")
         .call(xAxis);
     //draw the yAxis
-    chartContainerSVG.append("g")
+    var yAxisG = chartContainerSVG.append("g")
         .attr("class", "y axis")
         .attr("transform", "translate(" + margins.left + "," + margins.top + ")")
         .call(yAxis);
+
+    yAxisG
+        .append("text").text("kWh").attr("text-anchor", "middle").attr("dy", "-1em");
+
+    function stackedChartUpdate(nestedData){
+        //update yScale
+        yScale.domain([0, getMaxY(nestedData)])
+
+        //data bind and 1 g per series for a postcode area
+        var postCodeSel = stackedChartSVG.selectAll(".series")
+            .data(nestedData, function(d){
+                return d.key
+            })
+
+        //throw out any unnecessary elements
+        postCodeSel.exit().remove()
+
+        var seriesG = postCodeSel.enter().append("g")
+            .attr("class", "series");
+
+        //then draw the actual stacked area
+        seriesG.append("path")
+            .attr("class", "series-path")
+            .attr("d", function(d){
+                d.values.forEach(function(item){
+                    item.key = new Date(item.key)
+                })
+                return areaFunc(d.values)
+            })
+            .style("fill", function(d){
+                return colorScale(d.key)
+            })
+            .on("click", function(d){
+                console.log(d)
+                d3EvtDisatcher.postcodeSelected(d)
+            })
+
+        //update areas
+        d3.selectAll(".series-path").attr("d", function(d){
+            d.values.forEach(function(item){
+                item.key = new Date(item.key)
+            })
+            return areaFunc(d.values)
+        })
+
+
+        //update yAxis
+        yAxis.scale(yScale)
+        d3.select(".y.axis").call(yAxis)
+
+    }
+
+    d3EvtDisatcher.on("postcodeSelected", function(data){
+        console.log(stackFunc([data]))
+        stackedChartUpdate(stackFunc([data]))
+    })
 })
 
 
