@@ -15,12 +15,14 @@ city but imagine a country-- then you can see which counties/states are getting 
 **Potential answers**
 
 For 1, 2, and 3 => a stacked area chart with Date as the x axis and total output as y. Contribution from each area 
-indicates the postcode area (e.g. BN6) 
+indicates the postcode area (e.g. BS6) 
 
 _Interactions:_
  
  when you click on one area corresponding to a postcode, the chart updates to show a line chart of that 
 postcode's output, and using a 'view all' (?) button to go back up to the default view
+- can also do this via the legend and the map (see below)
+- tooltip line to show actual values of data points on a day
 
 4, 5, 6: idea is to use a map with a postcode area overlay (potentially color corresponding to a quantised generation
 value from that postcode) 
@@ -35,7 +37,8 @@ could use areas withing areas?)
 
 6: assuming that the dots are not too dense, when you click on one dot it gives you a tooltip box with info about
 the solar panel info (and/or data) about that property e.g. linking to the other datasets you can get info about 
-when the panel is installed, and the capacity, as well as historic feed in tarrif claims
+when the panel is installed, and the capacity, as well as historic feed in tarrif claims (<em>note this 
+may work better with a new view? e.g. replacing the stacked chart with info about one house only</em>)
 
 
 
@@ -66,3 +69,24 @@ absolute min for support?)
 **Notes**
 
 Data source: https://data.gov.uk/dataset/energy-generation-from-solar-pv-arrays-for-selected-bristol-buildings
+
+**TODOs:**
+
+LOTS at the moment:
+
+- tidy up code from the prototype testing ground into closure/ reusable chart module as per structure started 
+ in 'app.js'
+- map from mapbox(?) with geojson overlay
+- intro text
+- menu buttons 
+- **transitions, transitions!!**
+- nicer colors for the stacked chart -- cateogory20c colours _are_ a bit garish...
+- window resize handlers
+- what to show on mobile view?
+
+Geojson overlay: 
+
+- shapefiles from http://www.opendoorlogistics.com/data/
+- get info about the Sectors.shp `ogrinfo -q Sectors.shp -sql "SELECT * FROM Sectors" -fid 1`
+- then use ogr to parse the shapefile `ogr2ogr bristol_layer.shp Sectors.shp -sql "SELECT * FROM Sectors where (name like '%BS%')"`
+

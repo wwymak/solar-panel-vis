@@ -9,3 +9,8 @@
     stroke-width: 2px;
     shape-rendering: crispEdges;
 }
+
+.map {
+    width: 100%;
+    min-height: 400px;
+}
