@@ -1,1 +1,11 @@
+.series {
+    cursor: pointer;
+}
 
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #121401;
+    stroke-width: 2px;
+    shape-rendering: crispEdges;
+}
