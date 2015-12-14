@@ -38,7 +38,7 @@ var areaFunc = d3.svg.area()
     .y1(function(d) { return yScale(d.y0 + d.y); });
 
 //d3 custom event listeners
-var d3EvtDisatcher = d3.dispatch('postcodeSelected')
+var d3EvtDisatcher = d3.dispatch('postcodeSelected', 'mapAreaSelected');
 
 //init svg for stackedAReaChart
 var chartContainerSVG = d3.select("#lineChartContainer").append("svg")
@@ -207,8 +207,11 @@ d3.csv("data/energy_generation.csv", function(err, data){
 
     }
 
-    d3EvtDisatcher.on("postcodeSelected", function(data){
+    d3EvtDisatcher.on("postcodeSelected.stackedChart", function(data){
         stackedChartUpdate([data]);
+    })
+    d3EvtDisatcher.on("postcodeSelected.map", function(data){
+        console.log(data)
     })
 });
 
