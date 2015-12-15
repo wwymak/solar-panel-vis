@@ -10,11 +10,14 @@ var map = L.mapbox.map('mapContainer', 'mapbox.emerald').setView([51.5, -2.58], 
 //load the geojson overlay of Bristol postcodes
 d3.json("data/bristol_postcode.json", function(err, topoData){
     var features = topojson.feature(topoData, topoData.objects.bristol_layers_joined);
+
+    //TODO filter the features so only the postcodes with data is shown
+    //console.log(features.features)
     //and add to the map
     var geoJsonLayer = L.geoJson(features).addTo(map);
 
     //make the map zoom to the postcodes
-    map.fitBounds(geoJsonLayer.getBounds()); //todo  check if this works
+    map.fitBounds(geoJsonLayer.getBounds()); 
 
     geoJsonLayer.eachLayer(function (layer) {
         //adding the id to each postcode polygon so they can be hidden etc to interact with the chart
@@ -33,10 +36,27 @@ d3.json("data/bristol_postcode.json", function(err, topoData){
             var polygonBounds = e.layer.getBounds()
             map.fitBounds(polygonBounds)
 
-            d3EvtDisatcher.mapAreaSelected(layer._path.id)
-        })
+            d3EvtDispatcher.mapAreaSelected(e.layer._path.id)
+        });
+
+        //hmm, trying to select an area in the .eachLayer don't work--
+        // TODO more searching the docs for a way to grab the layer that I want
+        //
+
+        //d3EvtDispatcher.on("postcodeSelected.map", function(data){
+        //    var postCodeKey = data.key; //use this to select the polygon on the map
+        //
+        //    console.log(postCodeKey, layer.feature.properties.post_area, layer.getBounds())
+        //    if(postCodeKey == layer.feature.properties.post_area){
+        //        map.fitBounds(layer.getBounds())
+        //    }
+        //
+        //});
         // this is how you get the bounding box of each postcode area polygon: console.log(layer.getBounds())
     });
 
+
+
     //TODO add some styling!
+    //also some weird artifacts left from the joining...
 })

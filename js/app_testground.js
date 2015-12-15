@@ -5,7 +5,7 @@
 
 var nestedData,
 
-    width = 600, height = 500, margins = {top:40, left: 50, bottom: 50, right:80};
+    width = 500, height = 400, margins = {top:40, left: 50, bottom: 50, right:80};
 
 //scales
 var xTimeScale = d3.time.scale().range([0, width]),
@@ -38,7 +38,7 @@ var areaFunc = d3.svg.area()
     .y1(function(d) { return yScale(d.y0 + d.y); });
 
 //d3 custom event listeners
-var d3EvtDisatcher = d3.dispatch('postcodeSelected', 'mapAreaSelected');
+var d3EvtDispatcher = d3.dispatch('postcodeSelected', 'mapAreaSelected');
 
 //init svg for stackedAReaChart
 var chartContainerSVG = d3.select("#lineChartContainer").append("svg")
@@ -165,7 +165,7 @@ d3.csv("data/energy_generation.csv", function(err, data){
                 return colorScale(d.key)
             })
             .on("click", function(d){
-                d3EvtDisatcher.postcodeSelected(d)
+                d3EvtDispatcher.postcodeSelected(d)
             })
 
         //update areas
@@ -207,21 +207,20 @@ d3.csv("data/energy_generation.csv", function(err, data){
 
     }
 
-    d3EvtDisatcher.on("postcodeSelected.stackedChart", function(data){
+    d3EvtDispatcher.on("postcodeSelected.stackedChart", function(data){
         stackedChartUpdate([data]);
     })
-    d3EvtDisatcher.on("postcodeSelected.map", function(data){
-        console.log(data)
+
+    d3EvtDispatcher.on("mapAreaSelected", function(postcodeID){
+        var item = nestedData.filter(function(d){
+            return d.key == postcodeID;
+        });
+        console.log(item);
+
+        stackedChartUpdate(item)
     })
 });
 
 
-
-
-
-
-//axis
-
-//areas
 
 //transitions
