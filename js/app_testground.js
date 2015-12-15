@@ -207,6 +207,10 @@ d3.csv("data/energy_generation.csv", function(err, data){
 
         legend.exit().remove();
 
+        legend.attr("transform", function (d, i) {
+          return "translate(0," + i * 20 + ")";
+        });
+
 
 
 
