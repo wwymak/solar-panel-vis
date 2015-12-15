@@ -33,6 +33,8 @@ _Interactions:_
 (caveat being that this isn't going to work nicely if everyone installs panels! -- maybe if data set is larger
 could use areas withing areas?)
 
+    - going from postcode to latlng: there is https://www.ordnancesurvey.co.uk/business-and-government/products/code-point-open.html       
+        - or actually used http://www.doogal.co.uk/BatchGeocoding.php instead
 - also tie postcode area zoom with the stacked area transition to data of one postcode only
 
 6: assuming that the dots are not too dense, when you click on one dot it gives you a tooltip box with info about
@@ -44,7 +46,7 @@ may work better with a new view? e.g. replacing the stacked chart with info abou
 
 **Tech**
 
-- Javascript: d3.js
+- Javascript: d3.js, mapbox.js (it's built on top of Leaflet.js) for mapping
 - CSS: Bootstrap (it's well established does responsive out of the box. Having said that, it may be more
 than is needed for a simple project, but assuming the prototype grows larger then it may be a useful choice. 
 Also I am most familiar with it so for something quick I am just putting it in for the grid based and 
