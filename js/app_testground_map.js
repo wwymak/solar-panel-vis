@@ -20,6 +20,7 @@ d3.json("data/bristol_postcode.json", function(err, topoData){
     map.fitBounds(geoJsonLayer.getBounds()); 
 
     geoJsonLayer.eachLayer(function (layer) {
+        layer.customID = layer.feature.properties.post_area;
         //adding the id to each postcode polygon so they can be hidden etc to interact with the chart
         if(typeof layer._path != 'undefined'){
             layer._path.id = layer.feature.properties.post_area;
@@ -39,23 +40,27 @@ d3.json("data/bristol_postcode.json", function(err, topoData){
             d3EvtDispatcher.mapAreaSelected(e.layer._path.id)
         });
 
-        //hmm, trying to select an area in the .eachLayer don't work--
-        // TODO more searching the docs for a way to grab the layer that I want
-        //
 
-        //d3EvtDispatcher.on("postcodeSelected.map", function(data){
-        //    var postCodeKey = data.key; //use this to select the polygon on the map
-        //
-        //    console.log(postCodeKey, layer.feature.properties.post_area, layer.getBounds())
-        //    if(postCodeKey == layer.feature.properties.post_area){
-        //        map.fitBounds(layer.getBounds())
-        //    }
-        //
-        //});
         // this is how you get the bounding box of each postcode area polygon: console.log(layer.getBounds())
     });
+    //hmm, trying to select an area in the .eachLayer don't work--
+    // Aha, got it-- assing a customID to each layer and do the layer filtering on that
+    //
+    d3EvtDispatcher.on("postcodeSelected.map", function(data){
+        var postCodeKey = data.key; //use this to select the polygon on the map
+        console.log(geoJsonLayer)
+        geoJsonLayer.eachLayer(function(layer){
+            if(layer.customID == postCodeKey){
+                map.fitBounds(layer.getBounds())
+                //TODO maybe do some other map highlighting things
+            }
+        });
+    });
 
-
+    //zoom out again to show all the postcodes when stacked chart transitions
+    d3EvtDispatcher.on("showAllData.map", function(){
+        map.fitBounds(geoJsonLayer.getBounds());
+    })
 
     //TODO add some styling!
     //also some weird artifacts left from the joining...
