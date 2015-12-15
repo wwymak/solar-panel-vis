@@ -14,3 +14,14 @@
     width: 100%;
     min-height: 400px;
 }
+
+/*the 'show all btn' for going from showing one postcode to all
+tyring to figure this one out really as btn not so great UI...
+*/
+.btn.chart-all-state{
+    display: none;
+}
+
+.btn.chart-selected-state{
+    display: block;
+}

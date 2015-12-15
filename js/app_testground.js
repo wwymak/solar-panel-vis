@@ -1,10 +1,11 @@
 /**
  * testing code for drawing
  * TODO once its all working nicely put it in a reusuable chart pattern or at least tidy it up a bit
+ * TODO Also remove vars etc out of the global scope!!
  */
 
 var nestedData,
-
+    //TODO change these defaults to grabbing e.g. width from page
     width = 500, height = 400, margins = {top:40, left: 50, bottom: 50, right:80};
 
 //scales
@@ -38,7 +39,7 @@ var areaFunc = d3.svg.area()
     .y1(function(d) { return yScale(d.y0 + d.y); });
 
 //d3 custom event listeners
-var d3EvtDispatcher = d3.dispatch('postcodeSelected', 'mapAreaSelected');
+var d3EvtDispatcher = d3.dispatch('postcodeSelected', 'mapAreaSelected', 'showAllData');
 
 //init svg for stackedAReaChart
 var chartContainerSVG = d3.select("#lineChartContainer").append("svg")
@@ -52,6 +53,7 @@ var stackedChartSVG = chartContainerSVG.append("g").attr("class", "chart-area")
 var legendSVG = chartContainerSVG.append("g").attr("class", "legend-group")
     .attr("transform", "translate(" +(width + margins.right - 10) + "," + 10 + ")");
 
+var showAllBtn = document.getElementById("showAllBtn");
 
 d3.csv("data/energy_generation.csv", function(err, data){
     if(err){
@@ -130,6 +132,7 @@ d3.csv("data/energy_generation.csv", function(err, data){
         .attr("transform", "translate(" + margins.left + "," + margins.top + ")")
         .call(yAxis);
 
+    //also need an axis label
     yAxisG
         .append("text").text("kWh").attr("text-anchor", "middle").attr("dy", "-1em");
 
@@ -185,31 +188,39 @@ d3.csv("data/energy_generation.csv", function(err, data){
         var legend = legendSVG.selectAll(".legend")
             .data(nestedData, function(d){return d.key});
 
-        legend.enter().append("g")
+        var legendG = legend.enter().append("g")
             .attr("class", "legend")
             .attr("transform", function (d, i) {
                 return "translate(0," + i * 20 + ")";
             });
 
+        legendG.append("rect").attr("x", 0)
+          .attr("width", 20)
+          .attr("height", 10)
+          .style("fill", function(d){return colorScale(d.key)} )
+
+        legendG.append("text")
+          .attr("x", 25)
+          .attr("y", 6)
+          .attr("dy", ".35em")
+          .text(function (d) { return d.key; });
+
         legend.exit().remove();
 
-        legend.append("rect").attr("x", 0)
-            .attr("width", 20)
-            .attr("height", 10)
-            .style("fill", function(d){return colorScale(d.key)} )
 
-        legend.append("text")
-            .attr("x", 25)
-            .attr("y", 6)
-            .attr("dy", ".35em")
-            .text(function (d) { return d.key; });
 
 
     }
 
     d3EvtDispatcher.on("postcodeSelected.stackedChart", function(data){
+        //update the stacked chart to show only 1 dataset
         stackedChartUpdate([data]);
-    })
+        //and update the control so you ahve the 'showAllbtn'
+        showAllBtn.classList.remove("chart-all-state");
+        showAllBtn.classList.add("chart-selected-state");
+    });
+
+    d3EvtDispatcher.on("showAllData.stackedChart", function(){stackedChartUpdate(nestedData)});
 
     d3EvtDispatcher.on("mapAreaSelected", function(postcodeID){
         var item = nestedData.filter(function(d){
@@ -218,7 +229,11 @@ d3.csv("data/energy_generation.csv", function(err, data){
         console.log(item);
 
         stackedChartUpdate(item)
-    })
+    });
+
+    showAllBtn.onclick =function(e){
+        d3EvtDispatcher.showAllData()
+    };
 });
 
 
