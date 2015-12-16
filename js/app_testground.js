@@ -7,6 +7,7 @@
  * TODO so basically the thing that really needs to be passed round is the list of postcode Areas-- make
  * something to get that first? But also true that also need lat lngs of where the panels are...
  *
+ * TODO:
  * control flow:
  * init stacked chart + map
  * load csv data + parse to get postcode list and arrays of lat lng
