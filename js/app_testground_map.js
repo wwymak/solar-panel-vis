@@ -2,21 +2,21 @@
  * Testing the map view using mapbox.js (Leaflet.js extension ) and mapbox tiles wiht
  */
 
-var d3MapDispatch = d3.dispatch('geoAreaSelect');
 
 L.mapbox.accessToken = 'pk.eyJ1Ijoid3d5bWFrIiwiYSI6IkxEbENMZzgifQ.pxk3bdzd7n8h4pKzc9zozw';
 var map = L.mapbox.map('mapContainer', 'mapbox.emerald').setView([51.5, -2.58], 9);
 
 //load the geojson overlay of Bristol postcodes
-d3.json("data/bristol_postcode.json", function(err, topoData){
-    var features = topojson.feature(topoData, topoData.objects.bristol_layers_joined);
+d3.json("data/bristol_postcode_simplified.json", function(err, topoData){
+    var features = topojson.feature(topoData, topoData.objects.bristol_layers_joined_simplified);
 
     //TODO filter the features so only the postcodes with data is shown
     //console.log(features.features)
     //and add to the map
     var geoJsonLayer = L.geoJson(features).addTo(map);
 
-    //make the map zoom to the postcodes
+    //make the map zoom to the postcodes : note this does not always translate to a close crop since
+    //zoom levels on the standard mapbox raster tiles only have integer zoom levels
     map.fitBounds(geoJsonLayer.getBounds()); 
 
     geoJsonLayer.eachLayer(function (layer) {

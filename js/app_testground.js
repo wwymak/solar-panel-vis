@@ -1,7 +1,22 @@
 /**
- * testing code for drawing
+ * prototype code for drawing the stacked area chart
+ *
  * TODO once its all working nicely put it in a reusuable chart pattern or at least tidy it up a bit
  * TODO Also remove vars etc out of the global scope!!
+ *
+ * TODO so basically the thing that really needs to be passed round is the list of postcode Areas-- make
+ * something to get that first? But also true that also need lat lngs of where the panels are...
+ *
+ * control flow:
+ * init stacked chart + map
+ * load csv data + parse to get postcode list and arrays of lat lng
+ * -csv data ready-- you can draw the stacked chart now
+ * then get geojson data-- when this is ready add the geojson overlay,
+ * using the postcode list to add properties to the geojson layers and path
+ * use the lat lng data to plot the solar panel points (and try to see if setFilter works to hide them when zoomed out)
+ * - once this is done register the handlers for d3.dispatch and this should tie the two charts together neatly
+ *
+ * 2 (or maybe 3 if lat lngs in seaprate file so potentially use queue.js to tidy things up
  */
 
 var nestedData,
@@ -72,7 +87,7 @@ d3.csv("data/energy_generation.csv", function(err, data){
         d.postCodeArea = d.postcode.split(" ")[0] //first part of the postcode to group areas by
     });
 
-    //parsing the data
+    //parsing the data-- group by postcode area , then by date, then sum output by date
     nestedData = d3.nest().key(function(d){return d.postCodeArea}).sortKeys(d3.ascending)
         .key(function(d){return d.date})
         .rollup(function(leaves){return d3.sum(leaves, function (d){return d.output});})
@@ -224,15 +239,18 @@ d3.csv("data/energy_generation.csv", function(err, data){
         showAllBtn.classList.add("chart-selected-state");
     });
 
-    d3EvtDispatcher.on("showAllData.stackedChart", function(){stackedChartUpdate(nestedData)});
+    d3EvtDispatcher.on("showAllData.stackedChart", function(){
+        stackedChartUpdate(nestedData);
+        showAllBtn.classList.remove("chart-selected-state");
+        showAllBtn.classList.add("chart-all-state");
+    });
 
     d3EvtDispatcher.on("mapAreaSelected", function(postcodeID){
         var item = nestedData.filter(function(d){
             return d.key == postcodeID;
         });
-        console.log(item);
 
-        stackedChartUpdate(item)
+        stackedChartUpdate(item);
     });
 
     showAllBtn.onclick =function(e){
