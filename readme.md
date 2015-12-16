@@ -37,6 +37,10 @@ could use areas withing areas?)
         - or actually used http://www.doogal.co.uk/BatchGeocoding.php instead
 - also tie postcode area zoom with the stacked area transition to data of one postcode only
 
+- mouseover a postcode area and the corresponding area in the stacked chart will highlight
+
+- when you have zoomed into a postcode area e.g. by clicking on the stacked chart it will show the markers of where the panels are
+
 6: assuming that the dots are not too dense, when you click on one dot it gives you a tooltip box with info about
 the solar panel info (and/or data) about that property e.g. linking to the other datasets you can get info about 
 when the panel is installed, and the capacity, as well as historic feed in tarrif claims (<em>note this 
